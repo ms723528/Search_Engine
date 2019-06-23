@@ -129,6 +129,7 @@ if __name__ == '__main__':
     
     # 3. Enter query 
     tokqry = processQuery(input("Enter query for search: "))
+    #tokqry = Tokenize(input("Enter query for search: "))
     print("Tokenized Query: {0}".format(tokqry))
     
     
@@ -149,6 +150,7 @@ if __name__ == '__main__':
         files[i].seek(0)
         documentBOW.append([])
         lista_archivo = files[i].read().lower().split()
+        print(lista_archivo)
         for word in lista_archivo:
             wordToken = Tokenize(word)
             if(wordToken != False):
@@ -158,11 +160,19 @@ if __name__ == '__main__':
     for dic in wordDict:
         print(dic, '\n')
 
-    """
+    #Generate Query BOW and Dict
     qryBOW = []
+    qryDict = dict.fromkeys(tokqry, 0)
+        
     for word in tokqry:
-        qryBOW[i].append(word)
-    """
+        qryDict[word]+=1
+        qryBOW.append(word)        
+    
+    print("Qry dict {0} and  BOW {1}".format(qryDict, qryBOW))#APC    
+    
+    #Combine Qry BOW and Dict with rest of docs
+    #wordDict.append(qryDict)    
+    print(wordDict)
     
     
     #%%
@@ -172,14 +182,20 @@ if __name__ == '__main__':
     listaTFs = []
     for i in range(len(documentBOW)):
         listaTFs.append(computeTF(wordDict[i], documentBOW[i]))
-        
+    
+    listaTFs.append(computeTF(qryDict, qryBOW))#APC    
+    
+    print("listaTFs {0}".format(listaTFs))    
     IDFs = computeIDF(wordDict)
     #print(IDFs)
     listaTFIDFs = []
     for tf in listaTFs:
         listaTFIDFs.append(computeTFIDF(tf,IDFs))
     
-    print(pd.DataFrame(listaTFIDFs))
+    matrix = pd.DataFrame(listaTFIDFs)
+    print(matrix)    
+    matrix = matrix.fillna(0.0)    
+    print(matrix)
         
     #%%    
     for file in files:
